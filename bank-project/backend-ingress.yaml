@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bank-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: http-01-production
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - bankapi.pod8medicare.online  # bankend url
+    - bank.pod8medicare.online     # frontend url
+    secretName: bank-pod8medicare-online
+  rules:
+  - host: bank.pod8medicare.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bank-frontend-service
+            port:
+              number: 3000
+  - host: bankapi.pod8medicare.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bank-backend-service
+            port:
+              number: 8080
